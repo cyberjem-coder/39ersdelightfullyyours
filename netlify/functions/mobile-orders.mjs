@@ -1,8 +1,10 @@
-import { store, verifyStoreKey, json } from "../../lib/store.mjs";
+import { createRequestStore, verifyStoreKey, json } from "../../lib/store.mjs";
 
 const orderKey = token => `order-${token}`;
 
 export default async function handler(request) {
+  // Netlify Blobs credentials are supplied in the active Functions request context.
+  const store = createRequestStore();
   const url = new URL(request.url);
 
   if (request.method === "GET") {
@@ -13,7 +15,7 @@ export default async function handler(request) {
       return json({ ok: true, order: { token: order.token, code: order.code, status: order.status } });
     }
 
-    if (!(await verifyStoreKey(request))) return json({ ok: false, message: "POS device not authorized." }, 403);
+    if (!(await verifyStoreKey(request, store))) return json({ ok: false, message: "POS device not authorized." }, 403);
     const status = (url.searchParams.get("status") || "PENDING").toUpperCase();
     if (!["PENDING", "CONFIRMED", "REJECTED"].includes(status)) {
       return json({ ok: false, message: "Invalid order status." }, 400);
@@ -99,7 +101,7 @@ export default async function handler(request) {
   }
 
   if (request.method === "PATCH") {
-    if (!(await verifyStoreKey(request))) return json({ ok: false, message: "POS device not authorized." }, 403);
+    if (!(await verifyStoreKey(request, store))) return json({ ok: false, message: "POS device not authorized." }, 403);
     let body;
     try { body = await request.json(); }
     catch { return json({ ok: false, message: "Invalid JSON request." }, 400); }

@@ -13,10 +13,10 @@ WHAT IT DOES NOT CHANGE
 No inventory, sales, checkout, VAT, discounts, promotions, receipts, order queue, Sold Out rules, Google Sheets scripts, Blobs store name, storage keys, cashier authorization rules, jingle, or other Netlify functions are changed by this patch.
 
 INSTALLATION
-On the GitHub main branch (this triggers a production deployment), replace these exact two files only:
+On the GitHub branch used for your Netlify preview, replace these exact two files only:
 - public/index.html
 - netlify/functions/mobile-menu.mjs
-Keep the folder paths exactly as shown. Commit the changes to main and let Netlify deploy it. Do not delete or rename any other file. Do not reset cashier authorization or delete Netlify Blobs data.
+Keep the folder paths exactly as shown. Commit the changes to the preview branch and let Netlify deploy it. Do not delete or rename any other file. Do not reset cashier authorization or delete Netlify Blobs data.
 
 HOW TO USE THE DIAGNOSTIC
 After deployment, refresh the cashier POS and open the QR/mobile-menu section so it attempts to publish again. If it fails, copy the Diagnostic part shown in the existing status message. Examples:

@@ -1,4 +1,4 @@
-import { store, verifyStoreKey, json } from "../../lib/store.mjs";
+import { createRequestStore, verifyStoreKey, json } from "../../lib/store.mjs";
 
 function cleanMenu(input) {
   if (!Array.isArray(input)) return [];
@@ -62,7 +62,7 @@ async function withStorageRetry(operationName, operation) {
   throw lastError;
 }
 
-async function handleRequest(request, setStage) {
+async function handleRequest(request, setStage, store) {
   if (request.method === "GET") {
     setStage("menu_storage_read");
     const saved = await withStorageRetry("menu read", () => store.get("customer-menu", { type: "json" }));
@@ -73,7 +73,7 @@ async function handleRequest(request, setStage) {
     // Authorization itself reads/writes Blobs; keep its failure distinct from the menu write.
     setStage("cashier_authorization_storage");
     const authorized = await withStorageRetry("cashier authorization", () =>
-      verifyStoreKey(request, { registerIfMissing: true })
+      verifyStoreKey(request, store, { registerIfMissing: true })
     );
     if (!authorized) {
       return json({ ok: false, message: "This POS device is not authorized to publish the menu." }, 403);
@@ -120,7 +120,10 @@ function safeDiagnostic(error, stage) {
 export default async function handler(request) {
   let failureStage = "request_handling";
   try {
-    return await handleRequest(request, stage => { failureStage = stage; });
+    // Create the Blobs client during the request so Netlify's runtime credentials
+    // are available. Do not move this back to module scope.
+    const store = createRequestStore();
+    return await handleRequest(request, stage => { failureStage = stage; }, store);
   } catch (error) {
     const incidentId = `menu-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const diagnostic = safeDiagnostic(error, failureStage);

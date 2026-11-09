@@ -38,11 +38,13 @@ DATA PRESERVATION
 
 INSTALLATION
 1. Keep a backup of the working GitHub repository.
-2. This package is intended for the main branch because Netlify is configured to deploy main. Committing it there triggers a production deployment.
-3. Upload the extracted contents at the repository root, preserving folder paths. Do not delete unrelated root files or the existing root-level index.html.
+2. Work on the separate mobile-qr-update branch, not the production branch.
+3. Replace only the root-level package.json with the one in this bundle if you
+   are updating the existing branch. The complete ZIP also contains the full
+   project for a fresh repository upload; do not delete unrelated root files.
 4. Keep Netlify Node.js at 24.x.
 5. Trigger a fresh deploy from Git after the package.json change.
-6. Confirm dependency installation and the production deployment complete before testing the live site.
+6. Confirm the dependency installation step completes before testing the preview.
 7. Check /api/mobile-menu with a read-only request first. Do not test writes in a
    preview unless you intend to change the shared live menu.
 8. Do not reset cashier authorization or delete/recreate any Blobs records.

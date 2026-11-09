@@ -1,4 +1,4 @@
-import { store, json } from "../../lib/store.mjs";
+import { createRequestStore, json } from "../../lib/store.mjs";
 import { timingSafeEqual } from "node:crypto";
 
 function tokenMatches(provided, expected) {
@@ -25,6 +25,9 @@ export default async function handler(request) {
     return json({ ok: false, message: "The reset code is incorrect." }, 403);
   }
 
+  // Create the Blobs client within this request handler so Netlify can provide
+  // the correct site-scoped credentials. This deletes only the cashier key hash.
+  const store = createRequestStore();
   await store.delete("pos-device-key-hash");
   return json({ ok: true, message: "Cashier device authorization has been reset. Return to the cashier POS in the intended Chrome browser and open the QR ordering panel to register and publish the menu." });
 }
