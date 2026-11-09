@@ -1,0 +1,78 @@
+39ERS DELIGHTS — MAIN BRANCH DEPLOYMENT PACKAGE
+
+PURPOSE
+This package is organized for the GitHub repository's MAIN branch because the
+Netlify build log showed that Netlify is currently deploying refs/heads/main.
+It adds the folder structure required by the existing netlify.toml:
+  public/                Netlify publish directory
+  netlify/functions/     Netlify Functions directory
+  lib/                   Shared Blobs storage helper
+  docs/                  Existing Google Sheets setup and sync files
+
+IMPORTANT: COMMITTING THESE FILES TO MAIN WILL TRIGGER A PRODUCTION DEPLOYMENT.
+Make sure you have a current backup of the GitHub repository before proceeding.
+
+HOW TO UPLOAD
+1. Download and extract this ZIP on your computer.
+2. Open the existing GitHub repository: 39ersdelightfullyyours.
+3. Select the branch named main.
+4. Use Add file -> Upload files.
+5. Upload the CONTENTS of the extracted folder at the repository root. Preserve
+   the folder names exactly. Do not upload the ZIP itself or the parent folder.
+6. Commit the upload to main. Netlify will start a production deployment.
+
+FILES/FOLDERS INCLUDED
+- public/index.html
+- public/reset-pos-device.html
+- public/assets/39ers-delights-jingle.mp3
+- netlify/functions/mobile-menu.mjs
+- netlify/functions/mobile-orders.mjs
+- netlify/functions/reset-pos-device.mjs
+- lib/store.mjs
+- docs/ (Google Sheets setup and synchronization)
+- netlify.toml
+- package.json
+- troubleshooting and upgrade notes
+
+DO NOT DELETE THESE EXISTING ROOT-LEVEL ITEMS
+- Existing root-level index.html (legacy copy; Netlify publishes public/)
+- Existing unrelated scripts, documentation, and assets
+- Any other file not specifically included in this package
+
+EXPECTED TOP-LEVEL LAYOUT AFTER UPLOAD
+  public/
+  netlify/
+  lib/
+  docs/
+  netlify.toml
+  package.json
+  [your existing root-level files remain]
+
+DEPLOYMENT SETTINGS
+- Keep Node.js at 24.x.
+- netlify.toml publishes public and uses netlify/functions.
+- package.json pins @netlify/blobs to 11.1.7 and overrides @netlify/otel
+  to 7.0.6. The user's later Netlify build log showed dependency installation
+  completed successfully with this dependency configuration.
+
+DATA AND FEATURE PRESERVATION
+This package contains application source only. It does not contain live sales,
+inventory, customer orders, browser localStorage, device keys, secrets, or the
+contents of Netlify Blobs. Existing store name and keys remain in the source:
+  store: 39ers-delights-mobile-orders
+  menu: customer-menu
+  cashier key hash: pos-device-key-hash
+Do not delete/recreate the Blobs store, change its region, clear cashier browser
+data, or reset authorization as part of this deployment.
+
+AFTER DEPLOYMENT
+1. Confirm Install dependencies succeeds.
+2. Confirm Netlify reports publish directory public exists and deployment
+   completes successfully.
+3. Visit /api/mobile-menu and confirm the response contains the saved menu.
+4. Test QR menu loading and a test order only after the menu loads successfully.
+5. Do not assume the BlobsInternalError is fixed solely because the build passes;
+   a successful read from the live function still needs to be verified.
+
+No source package can guarantee that all future Netlify/platform/network errors
+will be eliminated. Keep your backup until the production site is fully tested.
